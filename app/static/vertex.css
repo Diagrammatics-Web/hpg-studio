@@ -1,0 +1,105 @@
+.selectable:hover {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 1));
+}
+
+.selected {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 1));
+}
+
+#paper {
+  border: 1px solid;
+}
+/* Vertex styles for filled and unfilled vertices */
+
+.filled-vertex {
+  fill: #222;
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+.unfilled-vertex {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+/* Edge styles */
+.edge-line {
+  stroke: #000;
+  stroke-width: 2px;
+}
+
+.edge-multiplicity {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  fill: #000;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.edge-multiplicity-bg {
+  fill: #fff;
+  stroke: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.edge-multiplicity-group {
+  cursor: pointer;
+}
+
+/* Inline controller overlay styles (used by inputInteger overlay) */
+.ic-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.ic-box {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  min-width: 320px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ic-label {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #222;
+}
+.ic-input {
+  font-size: 14px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.ic-error {
+  color: #b00020;
+  font-size: 12px;
+  min-height: 16px;
+}
+.ic-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.ic-buttons button {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #888;
+  background: #f5f5f5;
+}
+.ic-buttons button:hover { background: #efefef; }
+

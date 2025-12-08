@@ -1,0 +1,98 @@
+{
+  "edges": [
+    {
+      "multiplicity": 1,
+      "sourceId": 4,
+      "targetId": 1,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 6,
+      "targetId": 0,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 5,
+      "targetId": 3,
+      "label": []
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 4,
+      "targetId": 2,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 4,
+      "targetId": 3,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 4,
+      "targetId": 0,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 5,
+      "targetId": 6,
+      "label": null
+    }
+  ],
+  "vertices": [
+    {
+      "id": 4,
+      "x": -4.440892098500626e-16,
+      "y": -6.661338147750939e-16,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 5,
+      "x": -2.3708535097152263,
+      "y": 7.047908427918609,
+      "filled": true,
+      "boundary": false
+    },
+    {
+      "id": 6,
+      "x": 2.3501071510751244,
+      "y": 7.059488119892042,
+      "filled": true,
+      "boundary": false
+    },
+    {
+      "id": 0,
+      "x": 7.071067811865475,
+      "y": 7.0710678118654755,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 1,
+      "x": 7.0710678118654755,
+      "y": -7.071067811865475,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 2,
+      "x": -7.071067811865475,
+      "y": -7.071067811865477,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 3,
+      "x": -7.071067811865477,
+      "y": 7.071067811865474,
+      "filled": true,
+      "boundary": true
+    }
+  ],
+  "layout": "circular"
+}

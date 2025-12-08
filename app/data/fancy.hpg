@@ -1,0 +1,280 @@
+{
+  "edges": [
+    {
+      "multiplicity": 2,
+      "sourceId": 10,
+      "targetId": 15,
+      "label": null
+    },
+    {
+      "multiplicity": 2,
+      "sourceId": 13,
+      "targetId": 14,
+      "label": [
+        2,
+        3
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 13,
+      "targetId": 3,
+      "label": [
+        4
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 16,
+      "targetId": 0,
+      "label": [
+        3
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 10,
+      "targetId": 11,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 12,
+      "targetId": 13,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 17,
+      "targetId": 5,
+      "label": [
+        3
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 14,
+      "targetId": 15,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 11,
+      "targetId": 1,
+      "label": [
+        2
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 15,
+      "targetId": 7,
+      "label": [
+        1
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 14,
+      "targetId": 17,
+      "label": null
+    },
+    {
+      "multiplicity": 2,
+      "sourceId": 11,
+      "targetId": 12,
+      "label": [
+        2,
+        4
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 16,
+      "targetId": 8,
+      "label": [
+        1
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 16,
+      "targetId": 9,
+      "label": [
+        2
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 12,
+      "targetId": 18,
+      "label": null
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 18,
+      "targetId": 2,
+      "label": [
+        2
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 17,
+      "targetId": 6,
+      "label": [
+        4
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 17,
+      "targetId": 4,
+      "label": [
+        2
+      ]
+    },
+    {
+      "multiplicity": 1,
+      "sourceId": 10,
+      "targetId": 16,
+      "label": null
+    }
+  ],
+  "vertices": [
+    {
+      "id": 10,
+      "x": -0.4895487344334155,
+      "y": 3.4152805578679324,
+      "filled": true,
+      "boundary": false
+    },
+    {
+      "id": 11,
+      "x": 4.356115773646989,
+      "y": 3.1150655319956133,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 12,
+      "x": 5.48037824930644,
+      "y": 0.02954258619808359,
+      "filled": true,
+      "boundary": false
+    },
+    {
+      "id": 13,
+      "x": 4.359735382916662,
+      "y": -3.06769680608801,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 14,
+      "x": -0.48342807446157215,
+      "y": -3.368054532934726,
+      "filled": true,
+      "boundary": false
+    },
+    {
+      "id": 15,
+      "x": -3.6576589362983296,
+      "y": 0.01574200831106818,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 16,
+      "x": -2.1449296695457236,
+      "y": 7.0785658516739325,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 17,
+      "x": -2.1433995045527596,
+      "y": -7.066759345440633,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 18,
+      "x": 7.74018912465322,
+      "y": 0.0147712930990421,
+      "filled": false,
+      "boundary": false
+    },
+    {
+      "id": 0,
+      "x": 3.090169943749474,
+      "y": 9.510565162951535,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 1,
+      "x": 8.090169943749475,
+      "y": 5.877852522924732,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 2,
+      "x": 10.0,
+      "y": 6.123233995736766e-16,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 3,
+      "x": 8.090169943749475,
+      "y": -5.87785252292473,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 4,
+      "x": 3.090169943749475,
+      "y": -9.510565162951535,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 5,
+      "x": -3.090169943749469,
+      "y": -9.510565162951538,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 6,
+      "x": -8.090169943749473,
+      "y": -5.877852522924733,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 7,
+      "x": -10.0,
+      "y": -1.8369701987210296e-15,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 8,
+      "x": -8.090169943749476,
+      "y": 5.877852522924729,
+      "filled": true,
+      "boundary": true
+    },
+    {
+      "id": 9,
+      "x": -3.0901699437494763,
+      "y": 9.510565162951535,
+      "filled": true,
+      "boundary": true
+    }
+  ],
+  "layout": "circular"
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HPG Studio</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='applet_analyzer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vertex.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- D3.js -->
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script> -->
+  <script src="{{ url_for('static', filename='d3.v7.js') }}"></script>
+
+</head>
+<body>
+  <!-- Ribbon now has a left tabs area and a right dataset indicator -->
+  <div id="applet-ribbon" class="ribbon">
+    <div id="applet-tabs" class="ribbon-tabs"></div>
+    <div id="dataset-indicator" class="dataset-indicator"></div>
+  </div>
+
+  <div id="tools-bar" class="tools-bar">
+    <div id="tools-container"></div>
+    <div id="global-settings" class="global-settings"></div>
+  </div>
+
+
+  <div id="content-area" class="content-area">
+    <p>Select an applet to see content here.</p>
+  </div>
+
+  <div id="status-bar" class="status-bar">Status: Ready</div>
+  <!-- Framework files -->
+  <script src="{{ url_for('static', filename='framework/input.js') }}"></script>
+  <script src="{{ url_for('static', filename='framework/tools.js') }}"></script>
+  <script src="{{ url_for('static', filename='framework/applets.js') }}"></script>
+  <script src="{{ url_for('static', filename='framework/app.js') }}"></script>
+
+  <!-- Applet definitions -->
+  <script src="{{ url_for('static', filename='applet_dataselector.js') }}"></script>
+  <script src="{{ url_for('static', filename='applet_editor.js') }}"></script>
+  <script src="{{ url_for('static', filename='applet_analyzer.js') }}"></script>
+
+  <!-- Main entry point -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

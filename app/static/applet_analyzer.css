@@ -1,0 +1,55 @@
+.face {
+  fill: #fff;
+}
+
+.face.selectable {
+  fill: #eee;
+  stroke: #aaa;
+  stroke-width: 1px;
+  opacity: 0.8;
+}
+
+.face.selectable:hover {
+  fill: #d8d8d8;
+}
+
+.edge {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.vertex-label {
+  font-family: sans-serif;
+  font-size: 10px;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.hourglass-label {
+  font-family: sans-serif;
+  font-size: 9px;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.hourglass-label {
+  font-size: 8px;
+  fill: red;
+  text-anchor: middle;
+  dominant-baseline: central
+}
+
+.unfilled {
+  fill: white;
+}
+
+.filled {
+  fill: black;
+}
+
+.vertex {
+  stroke: black;
+  stroke-width: 2px;
+}
