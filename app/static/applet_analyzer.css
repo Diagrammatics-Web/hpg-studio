@@ -3,20 +3,14 @@
 }
 
 .face.selectable {
-  fill: #eee;
+  /*fill: #eee;
   stroke: #aaa;
   stroke-width: 1px;
-  opacity: 0.8;
+  opacity: 0.8;*/
 }
 
 .face.selectable:hover {
   fill: #d8d8d8;
-}
-
-.edge {
-  fill: none;
-  stroke: black;
-  stroke-width: 2px;
 }
 
 .vertex-label {

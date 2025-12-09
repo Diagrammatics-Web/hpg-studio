@@ -9,6 +9,7 @@ from HourglassClasses.hourglassplabicgraph import HourglassPlabicGraph
 
 app = Flask(__name__)
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # --- Persistent store for combinatorial graphs ---
 class HPGStore:
@@ -127,7 +128,6 @@ def delete_dataset(name):
 @app.route('/datasetsApplet/getData/<name>', methods=['GET'])
 def datasets_applet_get(name):
     """Endpoint for the 'datasets' applet to get its data."""
-    #fmt = request.args.get('format') or 'edge_list'
     try:
         ds = STORE.get(name)
     except KeyError:
@@ -196,33 +196,27 @@ def _get_ds_from_request():
     except KeyError:
         raise KeyError(f"Dataset '{name}' not found")
 
-@app.route('/analyzerApplet/tutte_layout', methods=['POST'])
-def analyzer_tutte_layout():
+@app.route('/analyzerApplet/tutte_layout/<name>', methods=['POST'])
+def analyzer_tutte_layout(name):
     """Applies the Tutte layout via the analyzer applet."""
     try:
-        name, ds = _get_ds_from_request()
+        ds = STORE.get(name)
         ds.tutte_layout()
         STORE._save(name)
         return jsonify({"name": name, "data": ds.to_dict_analyzer()})
     except (ValueError, KeyError) as e:
         return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        # Log the full error for debugging
+        print(f"Error during Tutte layout for {name}: {e}")
+        return jsonify({"error": "Failed to apply Tutte layout."}), 500
 
-@app.route('/analyzerApplet/lloyd_layout', methods=['POST'])
-def analyzer_lloyd_layout():
-    """Applies the Lloyd layout via the analyzer applet."""
-    try:
-        name, ds = _get_ds_from_request()
-        ds.lloyd_layout()
-        STORE._save(name)
-        return jsonify({"name": name, "data": ds.to_dict_analyzer()})
-    except (ValueError, KeyError) as e:
-        return jsonify({"error": str(e)}), 400
 
-@app.route('/analyzerApplet/cycle_face', methods=['POST'])
-def analyzer_cycle_face():
+@app.route('/analyzerApplet/cycle_face/<name>', methods=['POST'])
+def analyzer_cycle_face(name):
     """Performs a cycle move on a face via the analyzer applet."""
     try:
-        name, ds = _get_ds_from_request()
+        ds = STORE.get(name)
         data = request.get_json()
         face_id = data.get('face_id')
         inverse = data.get('inverse', False)
@@ -233,11 +227,11 @@ def analyzer_cycle_face():
     except (ValueError, KeyError) as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/analyzerApplet/square_move', methods=['POST'])
-def analyzer_square_move():
+@app.route('/analyzerApplet/square_move/<name>', methods=['POST'])
+def analyzer_square_move(name):
     """Performs a square move on a face via the analyzer applet."""
     try:
-        name, ds = _get_ds_from_request()
+        ds = STORE.get(name)
         data = request.get_json()
         face_id = data.get('face_id')
         if ds.is_square_move_valid(face_id):
@@ -247,16 +241,15 @@ def analyzer_square_move():
     except (ValueError, KeyError) as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/analyzerApplet/separation_labeling', methods=['POST'])
-def analyzer_separation_labeling():
+@app.route('/analyzerApplet/separation_labeling/<name>', methods=['POST'])
+def analyzer_separation_labeling(name):
     """Calculates and applies separation labeling via the analyzer applet."""
     try:
-        name, ds = _get_ds_from_request()
+        ds = STORE.get(name)
         data = request.get_json()
         face_id = data.get('face_id')
         rank = max(v.total_degree() for v in ds._inner_vertices.values())
         ds.separation_labeling(ds._faces[face_id], rank)
-        STORE._save(name)
         return jsonify({"name": name, "data": ds.to_dict_analyzer()})
     except (ValueError, KeyError) as e:
         return jsonify({"error": str(e)}), 400
@@ -270,6 +263,18 @@ def analyzer_get_trip():
     v = ds._get_vertex(data.get('vertexId'))
     trip = ds.get_trip(v, data.get('tripIndex'), output='ids')
     return jsonify({"trip": trip})
+
+@app.route('/analyzerApplet/get_edge_trips/<name>', methods=['POST'])
+def get_edge_trips(name):
+    ds = STORE.get(name)
+    data = request.get_json()
+    strand_id = data.get('strand_id')
+    print("get edge trips", strand_id)
+    for h in ds._get_edges():
+        for s in h.iterate_strands():
+            if s.id == strand_id:
+                r = max(h.v_from().total_degree(),h.v_to().total_degree())
+                return jsonify({"trips": [s.get_trip(i, output='ids') for i in range(1,r)]})
 
 if __name__ == '__main__':
     app.run(debug=True)

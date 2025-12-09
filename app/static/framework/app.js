@@ -58,21 +58,6 @@ class App {
     const newAppletInfo = this.applets[newAppletIndex];
     const oldAppletInfo = this.currentAppletInfo;
 
-    // Handle unsaved changes in Editor
-    if (oldAppletInfo && oldAppletInfo.name === "Editor" && editor.hasUnsavedChanges) {
-      if (!confirm("You have unsaved changes in the Editor. Do you want to discard them?")) {
-        // User cancelled, revert radio button selection and do not switch applet
-        const oldAppletRadio = document.querySelector(`input[name="applet-tabs"][value="${oldAppletInfo.name}"]`);
-        if (oldAppletRadio) {
-          oldAppletRadio.checked = true;
-        }
-        return; // Stop the applet switch
-      } else {
-        // User confirmed discarding changes
-        editor.hasUnsavedChanges = false;
-      }
-    }
-
     // Stop the currently running tool of the old applet, if any
     if (oldAppletInfo && oldAppletInfo.applet.selectedTool) {
       oldAppletInfo.applet.selectedTool.stopTool();
@@ -81,6 +66,12 @@ class App {
     this.currentAppletInfo = newAppletInfo;
     this.currentAppletInfo.applet.run();
     this.updateStatus(`Selected ${this.currentAppletInfo.name}`);
+
+    const radios = this.tabsContainer.querySelectorAll('input[type="radio"]');
+    console.log(radios);
+    radios.forEach(radio => {
+      radio.checked = (radio.value === this.currentAppletInfo.name);
+    });
   }
 
   run() {

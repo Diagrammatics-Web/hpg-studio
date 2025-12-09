@@ -2,7 +2,6 @@ var ic = new InputController();
 editor = new Applet({vertices:[], edges:[]});
 editor.size = 750;
 editor.ic = ic;
-editor.hasUnsavedChanges = false; // New flag for unsaved changes
 
 /**
  * Preprocesses graph data after fetching. It resolves vertex object references for edges.
@@ -19,9 +18,6 @@ editor.preprocess_data = function() {
   });
 }
 
-// After initial load or data fetch, assume no unsaved changes
-editor.hasUnsavedChanges = false;
-
 /**
  * Fetches the graph data for the currently selected dataset from the backend.
  */
@@ -34,6 +30,43 @@ editor.fetchData = async function() {
   this.preprocess_data();
   this.update();
 }
+
+/**
+ * Saves the current graph data to the server automatically.
+ */
+editor.saveData = async function() {
+  const applet = this;
+  const datasetName = applet.app.selectedDataset;
+
+  if (!datasetName) {
+    applet.app.updateStatus("No dataset selected to save to.");
+    return;
+  }
+
+  // Prepare data for serialization: convert vertex objects in edges back to IDs
+  const edgesForSave = applet.data.edges.map(e => ({
+    sourceId: e.source.id,
+    targetId: e.target.id,
+    multiplicity: e.multiplicity
+  }));
+
+  const dataToSave = {
+    vertices: applet.data.vertices,
+    edges: edgesForSave
+  };
+
+  try {
+    const res = await fetch(`/editorApplet/saveData/${encodeURIComponent(datasetName)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataToSave)
+    });
+    if (!res.ok) throw new Error(`Save failed: ${res.statusText}`);
+  } catch (err) {
+    applet.app.updateStatus(`Error saving: ${err.message}`);
+    console.error('Error saving graph:', err);
+  }
+};
 
 
 
@@ -113,10 +146,20 @@ editor._getVertexIndex = function(vertexObject) {
   return -1;
 };
 
+const defaultToolEditor = new Tool("")
+  .setIcon("fa-solid fa-arrow-pointer")
+  .on("start", function () {
+    // Does nothing
+  })
+  .on("stop", function () {
+    // Does nothing
+  });
+
+
 /*********************
 * Zoom and Pan tool  *
 *********************/
-panAndZoom = new Tool("panAndZoom")
+/*panAndZoom = new Tool("panAndZoom")
   .setIcon("fa-solid fa-hand")
   .on("start", function() {
     this.currentCursor = this.applet.svg.style("cursor");
@@ -131,14 +174,14 @@ panAndZoom = new Tool("panAndZoom")
       this.applet.svg.on('.zoom', null);
       this.applet.svg.style("cursor", this.currentCursor);
     }
-  });
+  });*/
 
 
 /*********************
 * Place Vertex tool  *
 *********************/
 placeVertex = new Tool("placeVertex")
-  .setIcon("fa-solid fa-circle-plus")
+  .setIcon("fa-solid fa-circle-half-stroke")
   .on("init", function(){
     this.addSetting("vertexType", new BinaryChoice("filled", "unfilled"));
   })
@@ -162,8 +205,8 @@ placeVertex = new Tool("placeVertex")
             boundary: false
           });
           maxVertexId++;
-          this.applet.hasUnsavedChanges = true; // Mark as unsaved
           this.applet.update();
+          this.applet.saveData();
           this.restartTool();
         })
         .catch(value => {
@@ -185,7 +228,7 @@ placeVertex = new Tool("placeVertex")
 * Place Edge tool    *
 *********************/
 placeEdge = new Tool("placeEdge")
-  .setIcon("fa-solid fa-share-nodes")
+  .setIcon("fa-solid fa-hourglass")
   .on("init", function(){
     this.addSetting("multiplicity", new Counter(1));
   })
@@ -222,8 +265,8 @@ placeEdge = new Tool("placeEdge")
                 multiplicity: multiplicity
               });
             }
-            tool.applet.hasUnsavedChanges = true; // Mark as unsaved
             tool.applet.update();
+            tool.applet.saveData();
             tool.restartTool();
         })
         .catch(value => {
@@ -241,9 +284,7 @@ placeEdge = new Tool("placeEdge")
     }
   });
 
-editor.addTool(panAndZoom, true);
-editor.addTool(placeVertex);
-editor.addTool(placeEdge);
+
 
 /**
  * Change Multiplicity tool. Click an existing edge, then input an integer to set its multiplicity.
@@ -262,8 +303,8 @@ changeMultiplicity = new Tool("changeMultiplicity")
         var newVal = values[1];
         if (edge) {
             edge.multiplicity = newVal;
-            tool.applet.hasUnsavedChanges = true; // Mark as unsaved
             tool.applet.update();
+            tool.applet.saveData();
         }
         tool.restartTool();
 
@@ -273,7 +314,10 @@ changeMultiplicity = new Tool("changeMultiplicity")
         if(err!="abort") {
             tool.restartTool();
         }
-      });
+      })
+      .finally(() => {
+        d3.selectAll('.selected').classed("selected", false);
+      })
   })
   .on("stop", function() {
     this.applet.ic.abortInput();
@@ -282,52 +326,7 @@ changeMultiplicity = new Tool("changeMultiplicity")
     }
   });
 
-editor.addTool(changeMultiplicity);
 
-const saveGraph = new Tool("save")
-  .setIcon("fa-solid fa-save")
-  .on("start", function() {
-    const tool = this;
-    const applet = this.applet;
-    const datasetName = applet.app.selectedDataset;
-
-    if (!datasetName) {
-      applet.app.updateStatus("No dataset selected to save to.");
-      applet.selectTool(applet.defaultTool);
-      return;
-    }
-
-    // Prepare data for serialization: convert vertex objects in edges back to IDs
-    const edgesForSave = applet.data.edges.map(e => ({
-      sourceId: e.source.id,
-      targetId: e.target.id,
-      multiplicity: e.multiplicity
-    }));
-
-    const dataToSave = {
-      vertices: applet.data.vertices,
-      edges: edgesForSave
-    };
-
-    console.log(edgesForSave)
-
-    fetch(`/editorApplet/saveData/${encodeURIComponent(datasetName)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dataToSave)
-    })
-    .then(res => res.ok ? res.json() : Promise.reject(new Error(`Save failed: ${res.statusText}`)))
-    .then(data => {
-      applet.app.updateStatus(`Dataset '${data.name}' saved successfully.`);
-      tool.applet.hasUnsavedChanges = false; // Mark as saved
-    })
-    .catch(err => {
-      applet.app.updateStatus(`Error saving: ${err.message}`);
-      console.error('Error saving graph:', err);
-    })
-    .finally(() => applet.selectTool(applet.defaultTool));
-  });
-editor.addTool(saveGraph);
 
 /**
  * Delete tool. Click a vertex to delete it and all its incident edges, or click an edge to delete just that edge.
@@ -357,8 +356,8 @@ deleteElement = new Tool("deleteElement")
           }
         }
         
-        tool.applet.hasUnsavedChanges = true; // Mark as unsaved
         tool.applet.update();
+        tool.applet.saveData();
         tool.restartTool();
       })
       .catch(err => {
@@ -375,7 +374,6 @@ deleteElement = new Tool("deleteElement")
     }
   });
 
-editor.addTool(deleteElement);
 
 
 
@@ -411,6 +409,13 @@ this.svg = d3.select("#content-area")
 
 this.canvasObjects = this.svg.append("g");
 
+this.canvasObjects.append("circle")
+  .attr("cx", this.x(0))
+  .attr("cy", this.y(0))
+  .attr("r", this.x(10) - this.x(0))
+  .attr("fill", "none")
+  .attr("stroke", "black");
+
 // init groups for edges and vertices
 this.edges = this.canvasObjects.append("g").attr("id", "edges");
 this.vertices = this.canvasObjects.append("g").attr("id", "vertices");
@@ -419,6 +424,8 @@ this.zoomed = d3.zoom()
     .translateExtent([[0, 0], [this.size, this.size]])
     .scaleExtent([1, 8])
     .on("zoom", e => this.canvasObjects.attr("transform", e.transform));
+
+this.svg.call(this.zoomed);
 
 this.fetchData();
 }
@@ -435,12 +442,12 @@ editor.dragHandler = d3.drag()
   .on("drag", function(event, d) {
     d.x += editor.x.invert(event.dx)-editor.x.invert(0);
     d.y += editor.y.invert(event.dy)-editor.y.invert(0);
-    editor.hasUnsavedChanges = true; // Mark as unsaved
     editor.update();
     d3.select(this).classed("selected", true);
   })
   .on("end", function(event, d) {
     d3.select(this).classed("selected", false);
+    editor.saveData();
     editor.update();
     editor.svg.selectAll(".vertex").classed("selectable", true);
   });
@@ -477,10 +484,9 @@ moveVertex = new Tool("moveVertex")
     }
   });
 
-editor.addTool(moveVertex);
 
 const tutteLayout = new Tool("tutteLayout")
-  .setIcon("fa-solid fa-diagram-project")
+  .setIcon("fa-solid fa-wand-magic-sparkles")
   .on("start", function() {
     const tool = this;
     const applet = this.applet;
@@ -502,7 +508,7 @@ const tutteLayout = new Tool("tutteLayout")
       applet.data = data.data;
       applet.preprocess_data();
       applet.update();
-      applet.hasUnsavedChanges = true; // Layout is a change that should be saved
+      applet.saveData();
     })
     .catch(err => {
       applet.app.updateStatus(`Error applying layout: ${err.message}`);
@@ -510,4 +516,13 @@ const tutteLayout = new Tool("tutteLayout")
     })
     .finally(() => applet.selectTool(applet.defaultTool));
   });
+
+
+
+editor.addTool(defaultToolEditor, true);
+editor.addTool(placeVertex);
+editor.addTool(moveVertex);
+editor.addTool(placeEdge);
+editor.addTool(changeMultiplicity);
+editor.addTool(deleteElement);
 editor.addTool(tutteLayout);

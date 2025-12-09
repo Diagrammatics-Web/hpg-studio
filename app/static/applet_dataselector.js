@@ -100,3 +100,32 @@ newHPG = new Tool("new")
   });
 
 dataSelector.addTool(newHPG);
+
+duplicateHPG = new Tool("duplicate")
+  .setIcon("fa-solid fa-copy")
+  .on("start", function() {
+    const tool = this;
+    ic.initInput()
+      .then(ic.inputString("Enter name for the new duplicate HPG:"))
+      .then(values => (tool.applet.app.updateStatus("Select the HPG to duplicate."), values))
+      .then(ic.input('.hpg-list-item'))
+      .then(values => {
+        const [newName, sourceName] = values;
+        return fetch('/datasets/duplicate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sourceName, newName })
+        });
+      })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`)))
+      .then(data => {
+        tool.applet.app.updateStatus(`Duplicated '${data.sourceName}' to '${data.newName}'.`);
+        tool.applet.selectTool(refreshList);
+      })
+      .catch(err => {
+        console.log('HPG duplication aborted', err);
+        tool.applet.selectTool(tool.applet.defaultTool);
+      });
+  });
+
+dataSelector.addTool(duplicateHPG);
