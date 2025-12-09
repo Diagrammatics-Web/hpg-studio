@@ -1,17 +1,17 @@
 var ic = new InputController();
-editor = new Applet({vertices:[], edges:[]});
+editor = new Applet({ vertices: [], edges: [] });
 editor.size = 750;
 editor.ic = ic;
 
 /**
  * Preprocesses graph data after fetching. It resolves vertex object references for edges.
  */
-editor.preprocess_data = function() {
+editor.preprocess_data = function () {
   maxVertexId = Math.max(...editor.data.vertices.map(v => v.id)) + 1;
 
   // add references to source and target vertices
   // TODO: This assumes vertex IDs are unique and present.
-  this.data.edges.forEach(function(edge, i) {
+  this.data.edges.forEach(function (edge, i) {
     edge.source = editor.data.vertices.filter(vertex => vertex.id == edge.sourceId)[0];
     edge.target = editor.data.vertices.filter(vertex => vertex.id == edge.targetId)[0];
     edge.id = i;
@@ -21,7 +21,7 @@ editor.preprocess_data = function() {
 /**
  * Fetches the graph data for the currently selected dataset from the backend.
  */
-editor.fetchData = async function() {
+editor.fetchData = async function () {
   const res = await fetch(`editorApplet/getData/${encodeURIComponent(this.app.selectedDataset)}`);
   const json = await res.json();
   console.log(json);
@@ -34,7 +34,7 @@ editor.fetchData = async function() {
 /**
  * Saves the current graph data to the server automatically.
  */
-editor.saveData = async function() {
+editor.saveData = async function () {
   const applet = this;
   const datasetName = applet.app.selectedDataset;
 
@@ -73,7 +73,7 @@ editor.saveData = async function() {
 /**
  * Redraws the SVG canvas, updating vertices, edges, and labels based on the current data.
  */
-editor.update = function() {
+editor.update = function () {
   // Update vertices.
   this.vertices.selectAll(".vertex").data(this.data.vertices, (d, i) => i)
     .join(
@@ -134,7 +134,7 @@ editor.update = function() {
  * @param {object} vertexObject - The vertex data object to find.
  * @returns {number} The index of the vertex, or -1 if not found.
  */
-editor._getVertexIndex = function(vertexObject) {
+editor._getVertexIndex = function (vertexObject) {
   // The input function returns the vertex data object directly
   // Find its index in the vertices array
   for (let i = 0; i < this.data.vertices.length; i++) {
@@ -181,43 +181,43 @@ const defaultToolEditor = new Tool("")
 * Place Vertex tool  *
 *********************/
 placeVertex = new Tool("placeVertex")
-  .setIcon("fa-solid fa-circle-half-stroke")
-  .on("init", function(){
+  .setIcon("fa-solid fa-circle-plus")
+  .on("init", function () {
     this.addSetting("vertexType", new BinaryChoice("filled", "unfilled"));
   })
-  .on("start", function() {
+  .on("start", function () {
     this.currentCursor = this.applet.svg.style("cursor");
     this.applet.svg.style("cursor", "pointer");
     this.applet.ic.initInput()
-        .then(this.applet.ic.inputXY("#paper"))
-        .then(value => {
-          console.log("done", value);
-          var xy = value[0];
-          var transform = d3.zoomTransform(this.applet.canvasObjects.node());
-          xy = transform.invert(xy);
-          // Get vertex type from settings
-          var vertexType = this.settings.vertexType.getValue();
-          this.applet.data.vertices.push({
-            id: maxVertexId,
-            x: this.applet.x.invert(xy[0]),
-            y: this.applet.y.invert(xy[1]),
-            filled: vertexType === "filled",
-            boundary: false
-          });
-          maxVertexId++;
-          this.applet.update();
-          this.applet.saveData();
-          this.restartTool();
-        })
-        .catch(value => {
-          console.log(value);
-          if(value!="abort") {
-            console.log("not abort");
-            this.restartTool();
-          }
+      .then(this.applet.ic.inputXY("#paper"))
+      .then(value => {
+        console.log("done", value);
+        var xy = value[0];
+        var transform = d3.zoomTransform(this.applet.canvasObjects.node());
+        xy = transform.invert(xy);
+        // Get vertex type from settings
+        var vertexType = this.settings.vertexType.getValue();
+        this.applet.data.vertices.push({
+          id: maxVertexId,
+          x: this.applet.x.invert(xy[0]),
+          y: this.applet.y.invert(xy[1]),
+          filled: vertexType === "filled",
+          boundary: false
         });
+        maxVertexId++;
+        this.applet.update();
+        this.applet.saveData();
+        this.restartTool();
+      })
+      .catch(value => {
+        console.log(value);
+        if (value != "abort") {
+          console.log("not abort");
+          this.restartTool();
+        }
+      });
   })
-  .on("stop", function() {
+  .on("stop", function () {
     this.applet.ic.abortInput();
     if (this.applet.svg) {
       this.applet.svg.style("cursor", this.currentCursor);
@@ -229,55 +229,55 @@ placeVertex = new Tool("placeVertex")
 *********************/
 placeEdge = new Tool("placeEdge")
   .setIcon("fa-solid fa-hourglass")
-  .on("init", function(){
+  .on("init", function () {
     this.addSetting("multiplicity", new Counter(1));
   })
-  .on("start", function() {
+  .on("start", function () {
     this.currentCursor = this.applet.svg.style("cursor");
     this.applet.svg.style("cursor", "pointer");
     var tool = this;
     this.applet.ic.initInput()
-        .then(this.applet.ic.input(".vertex"))
-        .then(this.applet.ic.input(".vertex"))
-        .then(values => {
-            console.log("done", values);
-            var source = values[0];
-            var target = values[1];
-            var multiplicity = tool.settings.multiplicity.getValue();
-            console.log("Adding edge", source, target, multiplicity);
-            // Do not create self-edges
-            if (source === target) {
-              console.log("Selected same vertex for sourceId and targetId; skipping self-edge");
-              tool.applet.update();
-              tool.restartTool();
-              return;
-            }
-
-            // If an edge between these vertices already exists (undirected), add multiplicities
-            var existing = tool.applet.data.edges.find(e => (e.source === source && e.target === target) || (e.source === target && e.target === source));
-            if (existing) {
-              existing.multiplicity = (existing.multiplicity || 0) + multiplicity;
-              console.log("Merged multiplicity into existing edge", existing);
-            } else {
-              tool.applet.data.edges.push({
-                source: source,
-                target: target,
-                multiplicity: multiplicity
-              });
-            }
-            tool.applet.update();
-            tool.applet.saveData();
-            tool.restartTool();
-        })
-        .catch(value => {
-          console.log(value);
+      .then(this.applet.ic.input(".vertex"))
+      .then(this.applet.ic.input(".vertex"))
+      .then(values => {
+        console.log("done", values);
+        var source = values[0];
+        var target = values[1];
+        var multiplicity = tool.settings.multiplicity.getValue();
+        console.log("Adding edge", source, target, multiplicity);
+        // Do not create self-edges
+        if (source === target) {
+          console.log("Selected same vertex for sourceId and targetId; skipping self-edge");
           tool.applet.update();
-          if(value!="abort") {
-            tool.restartTool();
-          }
-        });
+          tool.restartTool();
+          return;
+        }
+
+        // If an edge between these vertices already exists (undirected), add multiplicities
+        var existing = tool.applet.data.edges.find(e => (e.source === source && e.target === target) || (e.source === target && e.target === source));
+        if (existing) {
+          existing.multiplicity = (existing.multiplicity || 0) + multiplicity;
+          console.log("Merged multiplicity into existing edge", existing);
+        } else {
+          tool.applet.data.edges.push({
+            source: source,
+            target: target,
+            multiplicity: multiplicity
+          });
+        }
+        tool.applet.update();
+        tool.applet.saveData();
+        tool.restartTool();
+      })
+      .catch(value => {
+        console.log(value);
+        tool.applet.update();
+        if (value != "abort") {
+          tool.restartTool();
+        }
+      });
   })
-  .on("stop", function() {
+  .on("stop", function () {
     this.applet.ic.abortInput();
     if (this.applet.svg) {
       this.applet.svg.style("cursor", this.currentCursor);
@@ -291,7 +291,7 @@ placeEdge = new Tool("placeEdge")
  */
 changeMultiplicity = new Tool("changeMultiplicity")
   .setIcon("fa-solid fa-pen-to-square")
-  .on("start", function() {
+  .on("start", function () {
     var tool = this;
     this.currentCursor = this.applet.svg.style("cursor");
     this.applet.svg.style("cursor", "pointer");
@@ -302,24 +302,24 @@ changeMultiplicity = new Tool("changeMultiplicity")
         var edge = values[0];
         var newVal = values[1];
         if (edge) {
-            edge.multiplicity = newVal;
-            tool.applet.update();
-            tool.applet.saveData();
+          edge.multiplicity = newVal;
+          tool.applet.update();
+          tool.applet.saveData();
         }
         tool.restartTool();
 
       })
       .catch(err => {
         console.log('edge selection aborted', err);
-        if(err!="abort") {
-            tool.restartTool();
+        if (err != "abort") {
+          tool.restartTool();
         }
       })
       .finally(() => {
         d3.selectAll('.selected').classed("selected", false);
       })
   })
-  .on("stop", function() {
+  .on("stop", function () {
     this.applet.ic.abortInput();
     if (this.applet.svg) {
       this.applet.svg.style("cursor", this.currentCursor);
@@ -333,7 +333,7 @@ changeMultiplicity = new Tool("changeMultiplicity")
  */
 deleteElement = new Tool("deleteElement")
   .setIcon("fa-solid fa-eraser")
-  .on("start", function() {
+  .on("start", function () {
     var tool = this;
     this.currentCursor = this.applet.svg.style("cursor");
     this.applet.svg.style("cursor", "pointer");
@@ -341,7 +341,7 @@ deleteElement = new Tool("deleteElement")
       .then(this.applet.ic.input('.vertex, .edge-line, .edge-multiplicity-group'))
       .then(values => {
         var element = values[0];
-        
+
         // Check if it's a vertex
         var vertexIndex = tool.applet._getVertexIndex(element);
         if (vertexIndex >= 0) {
@@ -355,7 +355,7 @@ deleteElement = new Tool("deleteElement")
             tool.applet.data.edges.splice(edgeIndex, 1);
           }
         }
-        
+
         tool.applet.update();
         tool.applet.saveData();
         tool.restartTool();
@@ -367,7 +367,7 @@ deleteElement = new Tool("deleteElement")
         }
       });
   })
-  .on("stop", function() {
+  .on("stop", function () {
     this.applet.ic.abortInput();
     if (this.applet.svg) {
       this.applet.svg.style("cursor", this.currentCursor);
@@ -380,54 +380,54 @@ deleteElement = new Tool("deleteElement")
 /**
  * Renders the main content area for the editor, setting up the SVG canvas, scales, and zoom behavior.
  */
-editor.renderContentArea = function() {
+editor.renderContentArea = function () {
   if (!this.app.selectedDataset) {
     this.app.updateStatus("Please select a dataset first.");
     this.app.selectApplet(0); // Redirect to HPGs applet
     return;
   }
 
-/*
- *  Initialize Canvas
- */
-var maxVertexId = 0;
-var body = d3.select("body");
-this.x = d3.scaleLinear().domain([-11,11]).range([0, this.size]);
-this.y = d3.scaleLinear().domain([-11,11]).range([this.size, 0]);
+  /*
+   *  Initialize Canvas
+   */
+  var maxVertexId = 0;
+  var body = d3.select("body");
+  this.x = d3.scaleLinear().domain([-11, 11]).range([0, this.size]);
+  this.y = d3.scaleLinear().domain([-11, 11]).range([this.size, 0]);
 
-var selectedIds = []; // ids of selected vertices
-var selected = []; // selected vertices
-var highlightedPath = null;
+  var selectedIds = []; // ids of selected vertices
+  var selected = []; // selected vertices
+  var highlightedPath = null;
 
-// init graph canvas
-d3.select("#content-area").selectAll("*").remove();
-this.svg = d3.select("#content-area")
- .append("svg")
- .attr("id", "paper")
- .attr("width", this.size)
- .attr("height", this.size);
+  // init graph canvas
+  d3.select("#content-area").selectAll("*").remove();
+  this.svg = d3.select("#content-area")
+    .append("svg")
+    .attr("id", "paper")
+    .attr("width", this.size)
+    .attr("height", this.size);
 
-this.canvasObjects = this.svg.append("g");
+  this.canvasObjects = this.svg.append("g");
 
-this.canvasObjects.append("circle")
-  .attr("cx", this.x(0))
-  .attr("cy", this.y(0))
-  .attr("r", this.x(10) - this.x(0))
-  .attr("fill", "none")
-  .attr("stroke", "black");
+  this.canvasObjects.append("circle")
+    .attr("cx", this.x(0))
+    .attr("cy", this.y(0))
+    .attr("r", this.x(10) - this.x(0))
+    .attr("fill", "none")
+    .attr("stroke", "black");
 
-// init groups for edges and vertices
-this.edges = this.canvasObjects.append("g").attr("id", "edges");
-this.vertices = this.canvasObjects.append("g").attr("id", "vertices");
+  // init groups for edges and vertices
+  this.edges = this.canvasObjects.append("g").attr("id", "edges");
+  this.vertices = this.canvasObjects.append("g").attr("id", "vertices");
 
-this.zoomed = d3.zoom()
+  this.zoomed = d3.zoom()
     .translateExtent([[0, 0], [this.size, this.size]])
     .scaleExtent([1, 8])
     .on("zoom", e => this.canvasObjects.attr("transform", e.transform));
 
-this.svg.call(this.zoomed);
+  this.svg.call(this.zoomed);
 
-this.fetchData();
+  this.fetchData();
 }
 
 
@@ -436,16 +436,16 @@ this.fetchData();
  * D3 drag handler for moving vertices.
  */
 editor.dragHandler = d3.drag()
-  .on("start", function(event, d) {
+  .on("start", function (event, d) {
     d3.select(this).classed("selected", true);
   })
-  .on("drag", function(event, d) {
-    d.x += editor.x.invert(event.dx)-editor.x.invert(0);
-    d.y += editor.y.invert(event.dy)-editor.y.invert(0);
+  .on("drag", function (event, d) {
+    d.x += editor.x.invert(event.dx) - editor.x.invert(0);
+    d.y += editor.y.invert(event.dy) - editor.y.invert(0);
     editor.update();
     d3.select(this).classed("selected", true);
   })
-  .on("end", function(event, d) {
+  .on("end", function (event, d) {
     d3.select(this).classed("selected", false);
     editor.saveData();
     editor.update();
@@ -467,7 +467,7 @@ editor.nodrag = d3.drag()
 *********************/
 moveVertex = new Tool("moveVertex")
   .setIcon("fa-solid fa-arrows-up-down-left-right")
-  .on("start", function() {
+  .on("start", function () {
     var tool = this;
     this.currentCursor = this.applet.svg.style("cursor");
     this.applet.svg.style("cursor", "pointer");
@@ -475,7 +475,7 @@ moveVertex = new Tool("moveVertex")
       .classed("selectable", true)
       .call(this.applet.dragHandler);
   })
-  .on("stop", function() {
+  .on("stop", function () {
     if (this.applet.svg) {
       this.applet.svg.selectAll(".vertex")
         .call(this.applet.nodrag)
@@ -485,9 +485,46 @@ moveVertex = new Tool("moveVertex")
   });
 
 
+/**
+ * Toggle Vertex Type tool. Click a vertex to switch its tpe (filled/unfilled).
+ */
+toggleVertexType = new Tool("toggleVertexType")
+  .setIcon("fa-solid fa-circle-half-stroke")
+  .on("start", function () {
+    var tool = this;
+    this.currentCursor = this.applet.svg.style("cursor");
+    this.applet.svg.style("cursor", "pointer");
+    this.applet.ic.initInput()
+      .then(this.applet.ic.input('.vertex'))
+      .then(values => {
+        var vertex = values[0];
+        if (vertex) {
+          vertex.filled = !vertex.filled; // Toggle the filled property
+          tool.applet.update();
+          tool.applet.saveData();
+        }
+        tool.restartTool();
+      })
+      .catch(err => {
+        console.log('vertex color toggle aborted', err);
+        if (err !== "abort") {
+          tool.restartTool();
+        }
+      })
+      .finally(() => {
+      });
+  })
+  .on("stop", function () {
+    this.applet.ic.abortInput();
+    if (this.applet.svg) {
+      this.applet.svg.style("cursor", this.currentCursor);
+    }
+  });
+
+
 const tutteLayout = new Tool("tutteLayout")
   .setIcon("fa-solid fa-wand-magic-sparkles")
-  .on("start", function() {
+  .on("start", function () {
     const tool = this;
     const applet = this.applet;
     const datasetName = applet.app.selectedDataset;
@@ -502,25 +539,26 @@ const tutteLayout = new Tool("tutteLayout")
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     })
-    .then(res => res.ok ? res.json() : Promise.reject(new Error(`Tutte layout failed: ${res.statusText}`)))
-    .then(data => {
-      applet.app.updateStatus(`Tutte layout applied to '${data.name}'.`);
-      applet.data = data.data;
-      applet.preprocess_data();
-      applet.update();
-      applet.saveData();
-    })
-    .catch(err => {
-      applet.app.updateStatus(`Error applying layout: ${err.message}`);
-      console.error('Error applying Tutte layout:', err);
-    })
-    .finally(() => applet.selectTool(applet.defaultTool));
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`Tutte layout failed: ${res.statusText}`)))
+      .then(data => {
+        applet.app.updateStatus(`Tutte layout applied to '${data.name}'.`);
+        applet.data = data.data;
+        applet.preprocess_data();
+        applet.update();
+        applet.saveData();
+      })
+      .catch(err => {
+        applet.app.updateStatus(`Error applying layout: ${err.message}`);
+        console.error('Error applying Tutte layout:', err);
+      })
+      .finally(() => applet.selectTool(applet.defaultTool));
   });
 
 
 
 editor.addTool(defaultToolEditor, true);
 editor.addTool(placeVertex);
+editor.addTool(toggleVertexType);
 editor.addTool(moveVertex);
 editor.addTool(placeEdge);
 editor.addTool(changeMultiplicity);

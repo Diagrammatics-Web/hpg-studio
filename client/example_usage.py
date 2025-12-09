@@ -1,20 +1,37 @@
 # example_usage.py
-from client import GraphServerClient
+import sys
+from sage.all import *
+from client import HPGStudioClient
 
-client = GraphServerClient(base_url="http://127.0.0.1:5000")
 
-print("Datasets:", client.list_datasets())
+sys.path.append('/home/stephan/Documents/Coding/sage/Diagrammatics-Web/hpg-lib/')
+from HourglassClasses.examples import Examples
 
-# Create a dataset
-print("Create hexagon:", client.create_dataset("hexagon", edges=[(1,2),(2,3),(3,4),(4,5),(5,6),(6,1)]))
+client = HPGStudioClient(base_url="http://127.0.0.1:5000")
 
-# Get raw
-print("Raw hexagon:", client.get_dataset_raw("hexagon"))
+print("Initial datasets:", client.list())
 
-# Get formats
-print("Edge list:", client.get_edge_list("hexagon"))
-print("Adjacency:", client.get_adjacency("hexagon"))
-print("D3:", client.get_d3("hexagon"))
+# A list of example names to test from the Examples class
+example_names = ["example_ASM", "example_5_by_2", "example_benzene"]
 
-# Delete
-print("Delete hexagon:", client.delete_dataset("hexagon"))
+for name in example_names:
+    print(f"\n--- Testing with '{name}' ---")
+    try:
+        # Get the graph object from the Examples class
+        graph_to_push = Examples.get_example(name)
+        print(f"Pushing '{name}' to the server...")
+        push_response = client.push(name, graph_to_push)
+        print("Server response:", push_response)
+
+        print(f"Pulling '{name}' from the server...")
+        pulled_graph = client.pull(name)
+        if pulled_graph:
+            print(f"Successfully pulled '{name}'.")
+
+        #print(f"Deleting '{name}' from the server...")
+        #delete_response = client.delete(name)
+        #print("Server response:", delete_response)
+    except ValueError as e:
+        print(f"Could not process example '{name}': {e}")
+
+print("\nFinal datasets:", client.list())

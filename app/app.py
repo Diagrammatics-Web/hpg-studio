@@ -115,6 +115,22 @@ def get_dataset_raw(name):
         return jsonify({"error": "Dataset not found"}), 404
     return jsonify({"name": name, "data": ds.to_dict()})
 
+@app.route('/datasets/duplicate', methods=['POST'])
+def datasets_applet_duplicate():
+    """Endpoint for the 'datasets' applet to duplicate a dataset."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        sourceName = data.get('sourceName')
+        newName = data.get('newName')
+        # Create a new HPG from the editor data and replace the old one in the store
+        STORE.hpgs[newName] = HourglassPlabicGraph.from_dict(STORE.get(sourceName).to_dict())
+        STORE._save(newName)
+    except KeyError:
+        return jsonify({"error": "Dataset not found"}), 404
+    return jsonify({"sourceName": sourceName, "newName": newName})
+
 @app.route('/datasets/<name>', methods=['DELETE'])
 def delete_dataset(name):
     """Deletes a specific dataset."""
@@ -134,6 +150,9 @@ def datasets_applet_get(name):
         return jsonify({"error": "Dataset not found"}), 404
     return jsonify({"name": name, "data": ds.to_dict()})
 
+
+
+
 @app.route('/analyzerApplet/getData/<name>', methods=['GET'])
 def analyzer_applet_get(name):
     """Endpoint for the 'analyzer' applet to get its data."""
@@ -144,7 +163,7 @@ def analyzer_applet_get(name):
     return jsonify({"name": name, "data": ds.to_dict_analyzer()})
 
 @app.route('/editorApplet/getData/<name>', methods=['GET'])
-def visualizer_applet_get(name):
+def editor_applet_get(name):
     """Endpoint for the 'editor' applet to get its data."""
     try:
         ds = STORE.get(name)
@@ -155,16 +174,14 @@ def visualizer_applet_get(name):
 @app.route('/editorApplet/saveData/<name>', methods=['POST'])
 def editor_applet_save(name):
     """Endpoint for the 'editor' applet to save its data."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
         # Create a new HPG from the editor data and replace the old one in the store
         STORE.hpgs[name] = HourglassPlabicGraph.from_dict(data)
         STORE._save(name)
         return jsonify({"name": name, "message": "Saved successfully"}), 200
-    except KeyError:
-        return jsonify({"error": "Dataset not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

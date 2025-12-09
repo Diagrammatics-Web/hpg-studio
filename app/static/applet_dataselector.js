@@ -106,11 +106,10 @@ duplicateHPG = new Tool("duplicate")
   .on("start", function() {
     const tool = this;
     ic.initInput()
-      .then(ic.inputString("Enter name for the new duplicate HPG:"))
-      .then(values => (tool.applet.app.updateStatus("Select the HPG to duplicate."), values))
       .then(ic.input('.hpg-list-item'))
+      .then(ic.inputString("Enter name for the new duplicate HPG:"))
       .then(values => {
-        const [newName, sourceName] = values;
+        const [sourceName, newName] = values;
         return fetch('/datasets/duplicate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
