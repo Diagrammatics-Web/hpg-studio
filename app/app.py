@@ -294,4 +294,4 @@ def get_edge_trips(name):
                 return jsonify({"trips": [s.get_trip(i, output='ids') for i in range(1,r)]})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

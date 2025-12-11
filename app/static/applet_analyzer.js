@@ -172,6 +172,10 @@ analyzer.renderContentArea = function () {
     this.app.selectApplet(0); // Redirect to HPGs applet
     return;
   }
+
+  this.edgePaths = [];
+  this.highlightedPath = null;
+
   this.x = d3.scaleLinear().domain([-11, 11]).range([0, this.size]);
   this.y = d3.scaleLinear().domain([-11, 11]).range([this.size, 0]);
 
