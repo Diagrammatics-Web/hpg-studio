@@ -3,9 +3,7 @@ from flask import Flask, render_template, jsonify, request
 import os, json
 
 # the following line allows importing from hpg-lib, adjust as needed for your setup
-import sys
-sys.path.append('/home/stephan/Documents/Coding/sage/Diagrammatics-Web/hpg-lib/')
-from HourglassClasses.hourglassplabicgraph import HourglassPlabicGraph
+from hpg_lib import HourglassPlabicGraph
 
 app = Flask(__name__)
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
