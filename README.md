@@ -1,6 +1,6 @@
 # About `hpg-studio`
 
-This is a Python/JavaScript implementation of a client and server for manipulating hourglass plabic graphs (HPG's) in a graphical user interface. Key functionality includes a graphical user interface for drawing HPG's, trip permutations, performing square moves, etc. A programmatic interface with the underlying backend companion project [hpg-lib](https://github.com/Diagrammatics-Web/hpg-lib) provides a powerful method to compute with the HPG's you draw, or to visualize HPG's. See [[GPPSS25]](https://arxiv.org/abs/2306.12501) for mathematical details.
+This is a Python/JavaScript implementation of a client and server for graphically manipulating hourglass plabic graphs (HPG's). Key functionality includes a graphical user interface for drawing HPG's, trip permutations, performing square moves, etc. A programmatic interface with the underlying backend companion project [hpg-lib](https://github.com/Diagrammatics-Web/hpg-lib) provides a powerful method to compute with the HPG's you draw, or to visualize HPG's. See [[GPPSS25]](https://arxiv.org/abs/2306.12501) for mathematical details.
 
 # Installation and basic usage
 
