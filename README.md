@@ -30,3 +30,12 @@ In your web browser's HPG Studio tab, click the `refresh list` button, and "exam
     False
     sage: H in G.get_square_move_class()
     True
+
+A slightly more interesting example:
+
+    sage: from hpg_lib.growthrules import get_nonelliptic_web
+    sage: T = StandardTableaux([10]*3).random_element()
+    sage:  G = get_nonelliptic_web(T)
+    sage: client.push("random-3-row")
+
+If you now refresh the list of HPG's in the web browser, the corresponding Kuperberg non-elliptic basis web will appear as "random-3-row".
