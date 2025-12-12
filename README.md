@@ -4,7 +4,7 @@ This is a Python/JavaScript implementation of a client and server for graphicall
 
 # Installation and basic usage
 
-You must have a working installation of [SageMath](https://doc.sagemath.org/html/en/installation/index.html). To install the current development version of `hpg-studio` in the system `sage`, run the following, either in a terminal or in Sage itself:
+You must have a working installation of [SageMath](https://doc.sagemath.org/html/en/installation/index.html). To install the current development version of `hpg-studio` in the system `sage`, run the following in a terminal:
 
     sage -pip install git+https://github.com/Diagrammatics-Web/hpg-studio/
 
