@@ -8,11 +8,11 @@ You must have a working installation of [SageMath](https://doc.sagemath.org/html
 
     sage -pip install git+https://github.com/Diagrammatics-Web/hpg-studio/
 
-The `hpg-studio` may be used as in the following example. First start the server by running the following in a terminal:
+The `hpg-studio` may be used as in the following example. First start the server which powers the user interface by running the following in a terminal:
 
     sage -python -m hpg_server
 
-The server by default runs on `http://127.0.0.1:5000`. Open a web browser and connect to that URL. You may draw new HPG's using the HPG Studio Editor tab. Available HPG's are stored in the first tab, which is initially empty. You amy also work with HPG's using the Analyzer tab, where you can view trips, perform moves, etc. (The save location is in `%site packages%/hpg_server/data/` where `%site packages%` may be found with `sage -python -m pip show hpg_studio`.)
+The server by default runs on `http://127.0.0.1:5000`. Open a web browser and connect to that URL. You may draw new HPG's using the HPG Studio Editor tab. Available HPG's are stored in the first tab, which is initially empty. You may also work with HPG's using the Analyzer tab, where you can view trips, perform moves, etc. (The save location is in `%site packages%/hpg_server/data/` where `%site packages%` may be found with `sage -python -m pip show hpg_studio`.)
 
 To programmatically interface with the underlying Sage library, start `sage` and proceed as in the following example.
 
