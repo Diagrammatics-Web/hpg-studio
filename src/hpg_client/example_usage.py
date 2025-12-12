@@ -1,11 +1,10 @@
 # example_usage.py
 import sys
 from sage.all import *
-from client import HPGStudioClient
+from hpg_client import HPGStudioClient
 
 
-sys.path.append('/home/stephan/Documents/Coding/sage/Diagrammatics-Web/hpg-lib/')
-from HourglassClasses.examples import Examples
+from hpg_lib.examples import Examples
 
 client = HPGStudioClient(base_url="http://127.0.0.1:5000")
 

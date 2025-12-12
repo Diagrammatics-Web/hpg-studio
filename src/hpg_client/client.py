@@ -2,8 +2,7 @@
 import requests
 import sys
 
-sys.path.append('/home/stephan/Documents/Coding/sage/Diagrammatics-Web/hpg-lib/')
-from HourglassClasses.hourglassplabicgraph import HourglassPlabicGraph
+from hpg_lib import HourglassPlabicGraph
 
 
 class HPGStudioClient:
