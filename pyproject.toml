@@ -1,0 +1,27 @@
+[project]
+name = "hpg-studio"
+version = "0.0.1"
+description = "A graphical interface for hourglass plabic graphs."
+authors = [
+  {name = "Joshua P. Swanson", email = "jpswanson3.14@gmail.com"},
+  {name = "Stephan Pfannerer", email = "stephan@pfannerer-mittas.net"},
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+    "flask",
+    "requests",
+    "hpg_lib",
+]
+
+[project.urls]
+repository = "https://github.com/Diagrammatics-Web/hpg-server"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+  packages = ["src/hpg_client", "src/hpg_server"]
+
